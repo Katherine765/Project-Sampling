@@ -3,7 +3,6 @@ I've also attached a screenshots of my games running.
 
 - Katherine Berger
 
-
 common abbreviations within code
 s = self
 c = canvas
