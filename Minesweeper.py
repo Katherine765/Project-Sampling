@@ -35,7 +35,7 @@ class Game:
         touching_locs = [(coli + i, rowi + j) for i in offsets for j in offsets if (coli+i, rowi+j) in s.b.keys()]
         touching_locs.remove((coli,rowi))
         return touching_locs
-
+    
     def set_up_board(s,e):
         click_loc = s.get_loc(e.x, e.y)
         placement_options = [loc for loc in s.b if not loc in s.get_touching_locs(click_loc)]
@@ -61,7 +61,7 @@ class Game:
         loc = s.get_loc(e.x,e.y)
         if loc in s.b:
             if s.b[loc] == 'm':
-                s.game_over(loc)
+                s.explode_mines(loc)
                 return
             x = s.coords[loc][0] + SS/2
             y = s.coords[loc][1] + SS/2
@@ -104,7 +104,7 @@ class Game:
             c.create_text((W*SS+10)/2, H*SS+35, text=f'Winner!    {total_time}s', font = 'Helvetica 20')
 
 
-    def game_over(s,bad_click_loc):
+    def explode_mines(s,bad_click_loc):
         c.unbind_all('<Button-1>') 
         c.unbind_all('<Button-3>') 
         
@@ -124,3 +124,5 @@ c.pack()
 g = Game()
 c.bind_all('<Button-1>', g.click)
 c.bind_all('<Button-3>', g.flag)
+
+tk.mainloop()
