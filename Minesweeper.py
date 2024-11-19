@@ -1,6 +1,4 @@
 #ez 10x8 w/ 10m, med 18x14 w/ 40m, hard 24x20 w/ 99m
-#if you click the same thing a bunch of times, it will count them as new opens
-
 #Imports
 import random as r
 from tkinter import *
@@ -38,7 +36,7 @@ class Game:
     
     def set_up_board(s,e):
         click_loc = s.get_loc(e.x, e.y)
-        placement_options = [loc for loc in s.b if not loc in s.get_touching_locs(click_loc)]
+        placement_options = [loc for loc in s.b if not loc in s.get_touching_locs(click_loc) and not loc==click_loc]
         s.mine_locs = r.sample(placement_options, NUM_MINES)
         for loc in s.mine_locs:
             s.b[loc] = 'm'
@@ -51,21 +49,24 @@ class Game:
     
     #Runs when a left click occurs, runs the start sequence if it is the first valid click
     def click(s,e):
+        loc = s.get_loc(e.x,e.y)
+        if s.clicked[loc]:
+            return
         if not s.started:
-            if s.get_loc(e.x, e.y) in s.b:
+            if loc in s.b:
                 s.started = True
                 s.start_time = time()
                 s.set_up_board(e)
             return
-        
-        loc = s.get_loc(e.x,e.y)
+
         if loc in s.b:
             if s.b[loc] == 'm':
                 s.explode_mines(loc)
                 return
-            x = s.coords[loc][0] + SS/2
-            y = s.coords[loc][1] + SS/2
+        
             if not s.clicked[loc]:
+                x = s.coords[loc][0] + SS/2
+                y = s.coords[loc][1] + SS/2
                 s.clicked[loc]=c.create_text(x, y, text=s.b[loc], font = f'Helvetica {int(SS/2)}')
             if s.b[loc] == 0:
                 s.expand(s.get_touching_locs(loc))
@@ -87,11 +88,11 @@ class Game:
     def flag(s,e):
         loc = s.get_loc(e.x,e.y)
         coord = s.coords[loc]
-        x = coord[0] ; y = coord[1]
         if s.flagged[loc]:
             c.delete(s.flagged[loc])
             s.flagged[loc] = None
         else:
+            x = coord[0] ; y = coord[1]
             s.flagged[loc]=c.create_rectangle(x,y,x+SS,y+SS,fill='#FF6B6B',outline='')
 
     
