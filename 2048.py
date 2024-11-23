@@ -3,7 +3,7 @@ from random import choice, randint
 from tkinter import *
 
 AX=15 ; AY=55 # dark grey bg anchors
-N=3 ; SS=70 ; PAD=5 # default 50 SS and 8 PAD # N for board being nxn grid (default 4)
+N=5 ; SS=50 ; PAD=5 # default 50 SS and 8 PAD # N for board being nxn grid (default 4)
 
 tk = Tk()
 c = Canvas(tk, width=2*AX+(N+1)*PAD+N*SS, height=AY+(N+1)*PAD+N*SS)
