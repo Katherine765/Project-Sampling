@@ -1,117 +1,87 @@
+from copy import copy
+from random import choice
+
 with open('wordle_words1.txt', 'r') as file:
     wordlist=[line.strip() for line in file.readlines()]
+alphabet = [chr(i) for i in range(ord('a'), ord('z')+1)]
 
 
 class Game():
-	def __init__(self):
-		self.frequency, self.placement = {}, {}
-		self.wrong, self.somewhere = [], []
-		self.know=[None for x in range(5)]
-		self.yellow={x:[] for x in range(5)}
-		self.tries=0
-		self.topChoice=None
+	def __init__(s):
+		s.live = True
+		s.word = choice(wordlist)
+		s.grays = []
+		s.yellow_list = []
+		s.yellow_dict={x:[] for x in range(5)}
+		s.greens=[None for _ in range(5)]
+		s.tries = 0
 
-	def checkValidity(self, potential_guess):
-		guess_list=list(potential_guess)
-
-		for x, letter in enumerate(guess_list):
-			#No grays in word
-			if letter in self.wrong:
-				return False
-			#No unmoved yellow
-			if letter in self.yellow[x]:
-				return False
-
-		for x, letter in enumerate(self.somewhere):
-        	#All yellows in word
-			if not letter in guess_list:
-				return False
-
-		for x, letter in enumerate(self.know):
-       		#All greens in word
-			if not letter is None and not letter==guess_list[x]:
-				return False
-
-		return True
-
-
-	def generateData(self, possible):
-		self.frequency=[0 for x in range(26)]
-		self.placement=[[0 for x in range(5)] for x in range(26)]
-		for possible_guess in possible:
-			guess_list=list(possible_guess)
-			for x in range(5):
-				letterNum=ord(possible_guess[x])-97
-				# Frequency counted once per word
-				if x == possible_guess.find(guess_list[x]):
-					self.frequency[letterNum] += 1
-				self.placement[letterNum][x] += 1
-
-
-	def chooseBest(self, possible):
-		topRank=0
-		for possible_guess in possible:
-			rank=0
-			guess_list=list(possible_guess)
-
-			for x, letter in enumerate(guess_list):
-				letterToNumber=ord(letter)-97
-				# Can only get frequency points once per letter per word
-				if x == possible_guess.find(letter):    
-					rank += self.frequency[letterToNumber]
-				rank += .55*self.placement[letterToNumber][x] # the .55 is experimentally determined
-			# switch this sign to be bad at wordle (would also have to make rank start bigger)
-			if rank>topRank:
-				topRank=rank
-				self.topChoice=possible_guess
-		
-		self.tries += 1
-
-	def actualCheck(self, word):
-		if word == self.topChoice:
+	def submit_guess(s, guess):
+		s.tries += 1
+		if s.word == guess:
+			s.live = False
 			return True
-
-		guess_list=list(self.topChoice)
-		for x, letter in enumerate(guess_list):
-			#Green  
-			if letter == word[x]:
-				self.know[x]=letter
-			#Yellow
-			elif letter in word:
-				self.somewhere.append(letter)
-				self.yellow[x].append(letter)
-			#Grey
+		for i, letter in enumerate(list(guess)):
+			if letter == s.word[i]:
+				s.greens[i]=letter
+			elif letter in s.word:
+				s.yellow_list.append(letter)
+				s.yellow_dict[i].append(letter)
 			else:
-				self.wrong.append(letter)
+				s.grays.append(letter)
 
+class AI:
+	def __init__(s):
+		s.game = Game()
+		s.valid_guesses = copy(wordlist)
+		s.frequency = {}
+		s.placement = {}
+		
+		
+	def get_validity(s, guess):
+		letters=list(guess)
+		for i, letter in enumerate(letters):
+			if letter in s.game.grays:
+				return False
+			if letter in s.game.yellow_dict[i]:
+				return False
+			if s.game.greens[i] and not letter==s.game.greens[i]:
+				return False
+		for letter in s.game.yellow_list:
+			if not letter in letters:
+				return False
+		return True
+	
+	def update_data(s):
+		s.valid_guesses = [guess for guess in s.valid_guesses if s.get_validity(guess)]
+		s.frequency= {letter: 0 for letter in alphabet}
+		s.placement={letter:[0 for _ in range(5)] for letter in alphabet}
+		for guess in s.valid_guesses:
+			for i, letter in enumerate(list(guess)):
+				# Frequency counted once per word
+				if guess.find(letter) == i:
+					s.frequency[letter] += 1
+				s.placement[letter][i] += 1
+				
+	def choose_guess(s):
+		s.update_data()
+		choice = None
+		best_score = 0
+		for guess in s.valid_guesses:
+			score = 0
+			for i, letter in enumerate(list(guess)):
+				if i == guess.find(letter):    
+					score += s.frequency[letter]
+				score += .55*s.placement[letter][i]
+			if score > best_score:
+				best_score = score
+				choice = guess
+		return choice
 
-def main(word):
-	if not word in wordlist:
-		print('Word not in wordlist.')
-		return
+ai = AI()
+while ai.game.live:
+	guess = ai.choose_guess()
+	print(guess)
+	ai.game.submit_guess(guess)
 
-	game=Game()
-	possible=wordlist
-	while True:
-		old_possible = possible
-		possible=[]
-		for potential_guess in old_possible:
-			if game.checkValidity(potential_guess):
-				possible.append(potential_guess)
-
-		game.generateData(possible)
-		game.chooseBest(possible)
-
-		print(game.topChoice)
-		if game.actualCheck(word):
-			print('Win in %s tries!' %game.tries)
-			return game.tries
-
-from random import choice
-total = 0
-for x in range(10):
-        total += main(choice(wordlist))
-        print()
-
-print(f'The bot averaged {total/10} guesses across these 10 games.')
-input('Type enter to exit.')
+print(f'Win in {ai.game.tries} tries!')
