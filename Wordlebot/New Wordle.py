@@ -45,7 +45,7 @@ class Game():
 				
 
 	def keypress(s, e):
-		if e.keysym == 'Return' and s.cued in wordlist:
+		if e.keysym == 'Return' and s.cued in big_wordlist:
 			result = s.submit_guess(s.cued)
 			for c_item in s.cued_canvas:
 				del c_item
