@@ -1,3 +1,4 @@
+# averages 3.47279792746114!!!
 # i plan on connecting this to my wordle graphics soon
 # it chooses "soare" first, so i hard-coded that so it doesn't have to think every time
 # the lookup table for the second guess is faster than thinking
