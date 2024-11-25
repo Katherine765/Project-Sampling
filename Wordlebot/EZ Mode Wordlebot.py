@@ -11,11 +11,13 @@ from random import choice, shuffle
 with open('wordle_words1.txt', 'r') as file:
     wordlist=[line.strip() for line in file.readlines()]
 with open('wordle_words2.txt', 'r') as file:
-	big_wordlist=[line.strip() for line in file.readlines()]
+	big_wordlist=set([line.strip() for line in file.readlines()])
+	big_wordlist.update(wordlist)
 
 alphabet = [chr(i) for i in range(ord('a'), ord('z')+1)]
 
-lookup = {'ccacc': 'plink', 'bcaca': 'leuch', 'ccaca': 'glitz', 'ccbcb': 'tepal', 'cbbcc': 'cloot', 'cbbbc': 'maron', 'ccbca': 'gault', 'cbbca': 'bundt', 'cbbac': 'abaca', 'bcbca': 'ampul', 'bcbcc': 'linty', 'ccbbc': 'riyal', 'ccbcc': 'clint', 'cbbaa': 'adore', 'ccbaa': 'afire', 'ccbbb': 'talar', 'ccbba': 'barca', 'ccaac': 'dhuti', 'ccbab': 'altho', 'bcacc': 'chals', 'ccbac': 'humic', 'cabbc': 'malty', 'bcbba': 'aalii', 'bbbba': 'arose', 'bbbbc': 'arson', 'bcbbc': 'abamp', 'bbbcc': 'aalii', 'bcbcb': 'ajwan', 'ccaaa': 'abaft', 'ccacb': 'letch', 'ccaab': 'lathy', 'bcacb': 'bufty', 'ccccb': 'teind', 'cccca': 'culti', 'cbccb': 'lento', 'cccbb': 'tined', 'cccab': 'delft', 'bcccb': 'teugh', 'ccccc': 'clint', 'cbccc': 'clint', 'cbcca': 'pling', 'cccbc': 'clint', 'bbccc': 'agloo', 'bcccc': 'mythi', 'cccac': 'fitch', 'caaac': 'board', 'baacc': 'abaca', 'caccc': 'culty', 'caccb': 'meynt', 'baccc': 'fubsy', 'cacca': 'pugil', 'cacba': 'faugh', 'cacbb': 'rewth', 'ccaba': 'diact', 'ccabc': 'clint', 'bcabc': 'bachs', 'cbabc': 'bravo', 'cccba': 'pudic', 'bccbc': 'cruft', 'cbcbc': 'cutin', 'cbcba': 'pownd', 'cbbcb': 'abcee', 'bbacc': 'chaos', 'cbcac': 'acidy', 'cbcaa': 'chore', 'bbcca': 'aitch', 'caacc': 'acyls', 'cabac': 'cobra', 'cabcc': 'liman', 'cacbc': 'cyton', 'bacca': 'pilum', 'cacac': 'almud', 'cbcbb': 'trued', 'bccbb': 'richt', 'bbcbc': 'acids', 'bccba': 'centu', 'bccca': 'cunit', 'bcaba': 'erase', 'bbccb': 'aahed', 'cccaa': 'abets', 'bacba': 'aargh', 'bacbb': 'loser', 'cbcab': 'abeam', 'baccb': 'nosey', 'cbbab': 'opera', 'cbaac': 'ovary', 'cbaca': 'ovate', 'cbacc': 'piano', 'bbcba': 'prose', 'ccabb': 'ached', 'caabc': 'roach', 'baabc': 'roast', 'bacbc': 'avows', 'acbcc': 'dault', 'acbbb': 'enmew', 'abbcc': 'ablow', 'acbca': 'ablet', 'acbbc': 'cuppy', 'abbbc': 'savor', 'acacc': 'thilk', 'acaca': 'thilk', 'acaaa': 'chapt', 'acaac': 'chapt', 'accca': 'pling', 'acccb': 'clipt', 'abccc': 'cloot', 'abcca': 'nempt', 'abcaa': 'chapt', 'abcac': 'nicht', 'abcbc': 'scour', 'accba': 'becap', 'accbb': 'unwet', 'accbc': 'bahut', 'acbcb': 'dempt', 'acccc': 'thilk', 'accaa': 'shire', 'accac': 'hault', 'aaacc': 'soapy', 'aacbb': 'sober', 'aaccc': 'atony', 'aabbc': 'solar', 'aacca': 'solve', 'aacac': 'sorry', 'accab': 'sperm', 'acabc': 'stair', 'bccac': 'usurp', 'bbcbb': 'verso'}
+lookup = {'ccacc': 'clink', 'bcaca': 'butch', 'ccaca': 'glitz', 'ccbcb': 'tepal', 'cbbcc': 'cloot', 'cbbbc': 'maron', 'ccbca': 'gault', 'cbbca': 'bundt', 'cbbac': 'antic', 'bcbca': 'thump', 'bcbcc': 'linty', 'ccbbc': 'riyal', 'ccbcc': 'clint', 'cbbaa': 'adore', 'ccbaa': 'afire', 'ccbbb': 'talar', 'ccbba': 'carbs', 'ccaac': 'dhuti', 'ccbab': 'letup', 'bcacc': 'chums', 'ccbac': 'mitch', 'cabbc': 'malty', 'bcbba': 'arise', 'bbbba': 'arose', 'bbbbc': 'arson', 'bcbbc': 'marsh', 'bbbcc': 'ascot', 'bcbcb': 'oaten', 'ccaaa': 'befog', 'ccacb': 'depth', 'ccaab': 'lathy', 'bcacb': 'fatly', 'ccccb': 'teind', 'cccca': 'guilt', 'cbccb': 'lento', 'cccbb': 'tined', 'cccab': 'delft', 'bcccb': 'uneth', 'ccccc': 'clint', 'cbccc': 'clint', 'cbcca': 'pling', 'cccbc': 'glint', 'bbccc': 'biogs', 'bcccc': 'mythi', 'cccac': 'tichy', 'caaac': 'board', 'baacc': 'bancs', 'caccc': 'culty', 'caccb': 'meynt', 'baccc': 'fubsy', 'cacca': 'guild', 'cacba': 'gouch', 'cacbb': 'rewth', 'ccaba': 'ditch', 'ccabc': 'clint', 'bcabc': 'chibs', 'cbabc': 'bravo', 'cccba': 'pudic', 'bccbc': 'cruft', 'cbcbc': 'cutin', 'cbcba': 'pwned', 'cbbcb': 'omega', 'bbacc': 'chaos', 'cbcac': 'cited', 'cbcaa': 'chore', 'bbcca': 'mitch', 'caacc': 'loath', 'cabac': 'cobra', 'cabcc': 'liman', 'cacbc': 'cyton', 'bacca': 'pilum', 'cacac': 'adult', 'cbcbb': 'trued', 'bccbb': 'richt', 'bbcbc': 'cited', 'bccba': 'punty', 'bccca': 'inust', 'bcaba': 'erase', 'bbccb': 'onset', 'cccaa': 'inust', 'bacba': 'worse', 'bacbb': 'loser', 'cbcab': 'retro', 'baccb': 'nosey', 'cbbab': 'opera', 'cbaac': 'ovary', 'cbaca': 'ovate', 'cbacc': 'piano', 'bbcba': 'prose', 'ccabb': 'mitch', 'caabc': 'roach', 'baabc': 'roast', 'bacbc': 'worst', 'acbcc': 'dault', 'acbbb': 'women', 'abbcc': 'salvo', 'acbca': 'sauce', 'acbbc': 'cuppy', 'abbbc': 'savor', 'acacc': 'thilk', 'acaca': 'thilk', 'acaaa': 'pinch', 'acaac': 'kotch', 'accca': 'pling', 'acccb': 'clipt', 'abccc': 'cloot', 'abcca': 'knelt', 'abcaa': 'pinch', 'abcac': 'nicht', 'abcbc': 'scour', 'accba': 'vaped', 'accbb': 'unwit', 'accbc': 'butch', 'acbcb': 'knelt', 'acccc': 'thilk', 'accaa': 'shire', 'accac': 'thilk', 'aaacc': 'soapy', 'aacbb': 'sober', 'aaccc': 'myoid', 'aabbc': 'solar', 'aacca': 'solve', 'aacac': 'sorry', 'accab': 'sperm', 'acabc': 'stair', 'bccac': 'usurp', 'bbcbb': 'verso'}
+
 
 class Game():
 	def __init__(s, word = choice(wordlist)):
@@ -74,10 +76,11 @@ class AI:
 	def get_guess_score(s, spread):
 		result = 0
 		for n in spread.values():
-			result += log(len(s.possible_words)/n,2)*n  #/len(s.possible_words)
+			result += log(len(s.possible_words)/n,2)*n  #/len(s.possible_words) not necessary, also just adding n^2 instead works pretty well
 		return result
 	def choose_second_guess(s):
-		return lookup[s.get_result(s.game.word,'soare')]
+		result = s.get_result(s.game.word,'soare')
+		return lookup[result]
 
 	def choose_guess(s):
 		s.possible_words = [word for word in s.possible_words if s.get_possibleness(word)]
@@ -89,7 +92,6 @@ class AI:
 			spread = copy(defaultdict(int))
 			for word in s.possible_words:
 				spread[s.get_result(word,guess)] += 1
-			#score = sum(n**2 for n in results.values())
 			score = s.get_guess_score(spread)
 			if score > best_score or (score==best_score and guess in s.possible_words):
 				best_score = score
@@ -98,10 +100,7 @@ class AI:
 		return choice
 
 
-'''word = 'twist'
-assert word in wordlist'''
-
-ai = AI()
+ai = AI('brown') # change word here, or leave blank for random
 print('soare')
 ai.game.submit_guess('soare')
 guess = ai.choose_second_guess()
@@ -113,5 +112,4 @@ while ai.game.live:
 	ai.game.submit_guess(guess)
 print(f'Win in {ai.game.tries} tries!')
 
-
-# average: 3.5367012089810017
+# average: 3.47279792746114
